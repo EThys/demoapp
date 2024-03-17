@@ -13,5 +13,6 @@ class Visitor extends Model
         'name',
         'secondName',
         'phone',
+        "status"
     ];
 }

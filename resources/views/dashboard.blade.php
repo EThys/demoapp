@@ -17,11 +17,6 @@
                   <div class="table-responsive table-scroll" data-mdb-perfect-scrollbar="true" style="position: relative; height: 700px">
                     <table class="table table-striped mb-0">
                       <thead style="background-color: #002d72;">
-                        
-                      @php
-                         // $qrcode= QrCode::size(300)->generate('https://techvblogs.com/blog/generate-qr-code-laravel-9');
-                          //var_dump($message);
-                      @endphp
                         <tr>
                           <th scope="col">Nom</th>
                           <th scope="col">Prénom</th>
