@@ -25,7 +25,7 @@ class VisitorController extends Controller
     public function state_status(Request $request)
     {
         $data               = json_decode($request->getContent());
-        $id                 = $data->id;
+        $id                 = (int)$data->id;
         $message            = "Ce QRCode a déjà été scannez";
         $verify             = Visitor::find($id);
         if($verify){
