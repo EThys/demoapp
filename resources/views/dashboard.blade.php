@@ -24,21 +24,27 @@
                           <th scope="col">Status</th>
                         </tr>
                       </thead>
+
                       <tbody>
-                        <tr>
-                          <td>Like a butterfly</td>
-                          <td>Boxing</td>
-                          <td>9:00 AM - 11:00 AM</td>
-                          <td>Aaron Chapman</td>
-                        </tr>
-                        <tr>
-                          <td>Mind &amp; Body</td>
-                          <td>Yoga</td>
-                          <td>8:00 AM - 9:00 AM</td>
-                          <td>Adam Stewart</td>
-                        </tr>
-                        
-                      </tbody>
+                        <tr class="text-center col-lg-1">
+                            @foreach ($visitors as $visitor)
+                              <td class="text-center">{{ $visitor->name }}</td>
+                              <td class="text-center col-lg-9">{{ $visitor->secondName }}</td>
+                              <td class="text-center col-lg-9">{{ $visitor->phone }}</td>
+                              <td style="color: @if ($visitor->status == 1) green @else red @endif" id="status{{ $visitor->id }}">
+                                @if ($visitor->status == 1)
+                                    Activé
+                                @else
+                                    Désactivé
+                                @endif
+                              </td>
+                             
+                        </tr>  
+                                     
+                      @endforeach
+                    </tbody>
+
+                     
                     </table>
                   </div>
                 </div>

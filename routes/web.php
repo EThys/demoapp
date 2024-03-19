@@ -8,11 +8,8 @@ use App\Http\Controllers\VisitorController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('/visitor', [VisitorController::class, 'generate']);
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::resource('/dashboard', VisitorController::class)->middleware(['auth', 'verified'])->name('store','dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
