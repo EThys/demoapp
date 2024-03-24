@@ -9,7 +9,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
+
+
 Route::resource('/dashboard', VisitorController::class)->middleware(['auth', 'verified'])->name('store','dashboard');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

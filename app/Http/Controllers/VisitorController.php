@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Visitor;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class VisitorController extends Controller
@@ -17,25 +19,13 @@ class VisitorController extends Controller
     }
 
 
-    // public function generate(int $id=0) {
-    //     $qrCodes = [];
-    //     $qrCodes['simple'] = QrCode::size(120)->generate('https://www.binaryboxtuts.com/');
-    //     $qrCodes['changeColor'] = QrCode::size(120)->color(255, 0, 0)->generate('https://www.binaryboxtuts.com/');
-    //     $qrCodes['changeBgColor'] = QrCode::size(120)->backgroundColor(255, 0, 0)->generate('https://www.binaryboxtuts.com/');
-         
-    //     $qrCodes['styleDot'] = QrCode::size(120)->style('dot')->generate('https://www.binaryboxtuts.com/');
-    //     $qrCodes['styleSquare'] = QrCode::size(120)->style('square')->generate('https://www.binaryboxtuts.com/');
-    //     $qrCodes['styleRound'] = QrCode::size(120)->style('round')->generate('https://www.binaryboxtuts.com/');
-     
-    //     //$qrCodes['withImage'] = QrCode::size(200)->format('png')->generate('https://www.binaryboxtuts.com/');    
-    //     return view('visitor')->with('QrCode',base64_encode(Qrcode::format('png')->size(256)->generate('eth')));
-    // }
     public function state_status(Request $request)
     {
         $data               = json_decode($request->getContent());
-        $phone                 = (int)$data->phone;
+        $id                 = (int)$data->id;
         $message            = "noscan";
-        $verify = Visitor::where('phone', $phone)->first();
+        $verify = Visitor::find($id);
+       
         if($verify){
             if($verify->status == 0){
                 $update_data = [
@@ -51,42 +41,81 @@ class VisitorController extends Controller
         return response($response,201);
     }
 
+    // public function getQrCode() {
+
+    //     $latestVisitor = Visitor::orderBy('created_at', 'desc')->first();
+      
+    //     if(!$latestVisitor) {
+    //       return response()->json(['error' => 'No visitors found'], 404);
+    //     }
+      
+    //     $qrCodePath = storage_path($latestVisitor->qrCode);
+      
+
+    //     $response = Response::make(Storage::get($qrCodePath), 200);
+
+    //     $response->header('Content-Type', 'image/svg+xml');
+
+    //     return $response;
+ 
+      
+    //   }
+
+    public function getLatestVisitorId() {
+
+        $latestVisitor = Visitor::orderBy('id', 'desc')->first();
+      
+        if(!$latestVisitor) {
+          return response()->json(['error' => "Visiteur n'existe pas"], 404);
+        }
+      
+        return response()->json([
+          'id' => $latestVisitor->id
+        ]);
+      
+      }
 
 
-    public function store(Request $request){
-        $msg = "Enregistrement réussie avec succès";
-        $status = 201;
+    public function store(Request $request) {
+
+        $validatedData = $request->validate([
+          'name' => 'required',
+          'secondName' => 'required', 
+          'phone' => 'required'
+        ]);
+        $phone=$validatedData['phone'];
+
+      // Vérifier s'il existe déjà pour les enregistrements ultérieurs
+
+        if(Visitor::where('phone', $phone)->exists()){
+            return response()->json(['message' => 'Visiteur existe déjà'], 400);
+        }
+        else{
+            $visitor = Visitor::create($validatedData);
         
-        $data = json_decode($request->getContent());
+            // Récupération de l'ID auto-généré
+            $id = $visitor->id;  
         
-        // Vérifier si un visiteur avec le même nom et numéro de téléphone existe déjà
-        $existingVisitor = Visitor::where('name', $data->name)
-                                ->where('phone', $data->phone)
-                                ->first();
+            // Génération du QR code
+            
+            $qrCode = QrCode::generate($id);
         
-        if($existingVisitor) {
-            $msg = "Le visiteur existe déjà"; 
-            $status = 400;
-        } 
-        else {
-            $state_save = Visitor::create([
-            'name' =>  $data->name,  
-            'secondName' =>  $data->secondName,
-            'phone' =>  $data->phone,
-            ]);
+            // Stockage du QR code
+            $qrCodePath = "qrcodes/qrcode-$id.svg";
+            Storage::put($qrCodePath, $qrCode);
+            
+            // Mise à jour de l'objet Visitor
+            $visitor->qrCode = $qrCodePath;
         
-            if(!$state_save){
-                $msg = "Echec de l'enregistrement";
-                $status = 400;
+            if(!$visitor->save()) {
+            return response()->json(['errors' => $visitor->errors()], 400); 
             }
         
-        }
-        
-        return response()->json([
-            "message"=>$msg,
-        ],$status);
-
-        return redirect()->route('visitors.index')->with('success', 'Ajouté avec succès');
+            return response()->json(['message' => 'Enregistré avec succès'], 201);
     
-    }
+        }
+      }
+
+
+   
 }

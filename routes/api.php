@@ -9,6 +9,7 @@ use App\Http\Controllers\VisitorController;
 Route::post('/access',[VisitorController::class,'state_status']);
 Route::post('/visitor',[VisitorController::class,'store']);
 Route::post('/login',[UserController::class,'login']);
+Route::get('/latestId', [VisitorController::class,'getLatestVisitorId']);
 // Route::group(['middleware'=>['auth:sanctum']], function () {
 //     //
     

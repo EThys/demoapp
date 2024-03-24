@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('secondName');
             $table->string('phone');
+            $table->string('qrCode')->default(0);
             $table->boolean('status')->default(0);
             $table->timestamps();
         });
