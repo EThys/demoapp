@@ -61,26 +61,24 @@ class VisitorController extends Controller
       
     //   }
 
-      public function getLatestVisitorId() {
+          function getLatestVisitorId() {
 
-        $latestVisitor = Visitor::orderBy('id', 'desc')->first();
-      
-        if(!$latestVisitor) {
-          return response()->json([
-            'id' => 1
-          ]);
-        }
-      
-        $id = $latestVisitor->id;
-      
-        $latestVisitor->id = $id + 1;
-        $latestVisitor->save();
-      
-        return response()->json([
-          'id' => $id  
-        ]);
-      
-      }
+            static $nextId = 1;
+          
+            $latestVisitor = Visitor::orderBy('id', 'desc')->first();
+          
+            if(!$latestVisitor) {
+              return response()->json(['id' => $nextId++]);
+            }
+          
+            $id = $latestVisitor->id;
+          
+            $latestVisitor->id = $id + 1;
+            $latestVisitor->save();
+          
+            return response()->json(['id' => $id]);
+          
+          }
 
 
     public function store(Request $request) {
