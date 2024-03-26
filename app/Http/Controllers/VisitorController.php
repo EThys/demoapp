@@ -61,7 +61,7 @@ class VisitorController extends Controller
       
     //   }
 
-    public function getLatestVisitorId() {
+      public function getLatestVisitorId() {
 
         $latestVisitor = Visitor::orderBy('id', 'desc')->first();
       
@@ -71,8 +71,13 @@ class VisitorController extends Controller
           ]);
         }
       
+        $id = $latestVisitor->id;
+      
+        $latestVisitor->id = $id + 1;
+        $latestVisitor->save();
+      
         return response()->json([
-          'id' => $latestVisitor->id
+          'id' => $id  
         ]);
       
       }
