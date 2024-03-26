@@ -66,7 +66,9 @@ class VisitorController extends Controller
         $latestVisitor = Visitor::orderBy('id', 'desc')->first();
       
         if(!$latestVisitor) {
-          return response()->json(['error' => "Visiteur n'existe pas"], 404);
+          return response()->json([
+            'id' => 1
+          ]);
         }
       
         return response()->json([
