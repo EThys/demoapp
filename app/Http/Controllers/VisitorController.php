@@ -10,7 +10,7 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class VisitorController extends Controller
 {
-    public static $latestId = 0;
+    //
     
     public function index()
     {
@@ -61,22 +61,19 @@ class VisitorController extends Controller
       
     //   }
 
-   
-
     public function getLatestVisitorId() {
-  
-      $latestVisitor = Visitor::latest('id')->first();
-  
-      if($latestVisitor) {
-        return response()->json(['id' => $latestVisitor->id]);
-      }
-  
-      return response()->json(['id' => self::$latestId++]);
-  
+
+      $latestId = 1;
+    
+      return response()->json([
+        'id' => $latestId  
+      ]);
+    
     }
 
 
     public function store(Request $request) {
+        $latestId = 1;
 
         $validatedData = $request->validate([
           'name' => 'required',
@@ -91,9 +88,13 @@ class VisitorController extends Controller
             return response()->json(['message' => 'Visiteur existe déjà'], 400);
         }
         else{
-          $visitor = Visitor::create($validatedData);
-
-          self::$latestId = $visitor->id; 
+          $visitor = Visitor::create([
+            'id' => $latestId++, 
+            'name' => $validatedData['name'],
+            'secondName' => $validatedData['secondName'],
+            'phone'=> $validatedData['phone']
+            // etc
+          ]);
         
             // Récupération de l'ID auto-généré
             $id = $visitor->id;  
