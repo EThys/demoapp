@@ -63,17 +63,20 @@ class VisitorController extends Controller
 
     public function getLatestVisitorId() {
 
-      $latestId = 1;
-    
-      return response()->json([
-        'id' => $latestId  
-      ]);
-    
-    }
+        $latestVisitor = Visitor::orderBy('id', 'desc')->first();
+      
+        if(!$latestVisitor) {
+          return response()->json(['error' => "Visiteur n'existe pas"], 404);
+        }
+      
+        return response()->json([
+          'id' => $latestVisitor->id
+        ]);
+      
+      }
 
 
     public function store(Request $request) {
-        $latestId = 1;
 
         $validatedData = $request->validate([
           'name' => 'required',
@@ -88,13 +91,7 @@ class VisitorController extends Controller
             return response()->json(['message' => 'Visiteur existe déjà'], 400);
         }
         else{
-          $visitor = Visitor::create([
-            'id' => $latestId++, 
-            'name' => $validatedData['name'],
-            'secondName' => $validatedData['secondName'],
-            'phone'=> $validatedData['phone']
-            // etc
-          ]);
+            $visitor = Visitor::create($validatedData);
         
             // Récupération de l'ID auto-généré
             $id = $visitor->id;  
@@ -114,7 +111,10 @@ class VisitorController extends Controller
             return response()->json(['errors' => $visitor->errors()], 400); 
             }
         
-            return response()->json(['message' => 'Enregistré avec succès'], 201);
+            return response()->json([
+              'message' => 'Enregistré avec succès',
+              'id'=>$id
+            ], 201);
     
         }
       }
